@@ -122,10 +122,10 @@ public class DefaultComponentDefinition implements ComponentDefinition {
    }
 
    protected void processChildren() {
-      GetterHandler _get = new Mirror().on(component).get();
+      GetterHandler get = new Mirror().on(component).get();
       Object child = null;
       for (Field field : reflectAllFieldsOn(component.getClass())) {
-         child = _get.field(field);
+         child = get.field(field);
          if (child != null) {
             this.children.add(new DefaultComponentDefinition(child, component).plus(reflectAllAnnotationsOn(field)));
          }
