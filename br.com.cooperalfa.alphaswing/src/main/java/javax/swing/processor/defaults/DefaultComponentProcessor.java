@@ -17,8 +17,10 @@ import javax.swing.bind.Binder;
 import javax.swing.factory.ComponentFactory;
 import javax.swing.processor.AnnotationProcessor;
 import javax.swing.processor.ComponentProcessor;
+import javax.swing.processor.PostInstantiatorProcessor;
 import javax.swing.register.AnnotationProcessorRegistra;
 import javax.swing.register.ComponentFactoryRegistra;
+import javax.swing.register.PostInstantiatonProcessorRegistra;
 import javax.swing.script.MirrorPropertyAccessor;
 import javax.swing.stereotype.Resource;
 import javax.swing.util.AnnotationUtils;
@@ -36,15 +38,18 @@ import org.springframework.context.ApplicationContext;
 public class DefaultComponentProcessor implements ComponentProcessor {
 
    @Inject
-   private ApplicationContext               spring;
+   private ApplicationContext                spring;
 
    @Inject
-   private ComponentFactoryRegistra         factories;
+   private ComponentFactoryRegistra          factories;
 
    @Inject
-   private AnnotationProcessorRegistra      processors;
+   private AnnotationProcessorRegistra       processors;
 
-   private Map<Object, ComponentDefinition> definitions = Collections.synchronizedMap(new WeakHashMap<Object, ComponentDefinition>());
+   @Inject
+   private PostInstantiatonProcessorRegistra postInstantiatonProcessors;
+
+   private Map<Object, ComponentDefinition>  definitions = Collections.synchronizedMap(new WeakHashMap<Object, ComponentDefinition>());
 
    @Override
    public <C> C apply(C component) {
@@ -100,6 +105,11 @@ public class DefaultComponentProcessor implements ComponentProcessor {
                if (factory.canProvide(field.getType())) {
                   if (_get.field(field) == null) {
                      _set.field(field).withValue(factory.provide(field.getType()));
+                     for (PostInstantiatorProcessor processor : postInstantiatonProcessors) {
+                        if (processor.accepts(_get.field(field))) {
+                           processor.process(_get.field(field));
+                        }
+                     }
                      continue bl_Fields;
                   }
                }
