@@ -2,6 +2,7 @@ package javax.swing.processor.defaults.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.WeakHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -18,6 +19,8 @@ import net.vidageek.mirror.exception.MirrorException;
 @Resource
 @ApplicationScoped
 public class ActionPerformedProcessor implements ActionProcessor {
+
+   WeakHashMap<Object, Object>     processed = new WeakHashMap<Object, Object>();
 
    @Inject
    private ActionProcessorRegistra registra;
@@ -39,12 +42,15 @@ public class ActionPerformedProcessor implements ActionProcessor {
       final Object component = definition.getTarget();
       final Object parent = definition.getParent();
       try {
-         new Mirror().on(component).invoke().method("addActionListener").withArgs(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               new Mirror().on(parent).invoke().method(action.method()).withArgs(e);
-            }
-         });
+         if (!processed.containsKey(component)) {
+            new Mirror().on(component).invoke().method("addActionListener").withArgs(new ActionListener() {
+               @Override
+               public void actionPerformed(ActionEvent e) {
+                  new Mirror().on(parent).invoke().method(action.method()).withArgs(e);
+               }
+            });
+            processed.put(component, action.method());
+         }
       } catch (MirrorException error) {
          error.printStackTrace();
       }

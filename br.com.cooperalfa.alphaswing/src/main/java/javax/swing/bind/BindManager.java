@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.annotation.Annotation;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.swing.api.ComponentDefinition;
 import javax.swing.event.ChangeEvent;
@@ -25,6 +28,7 @@ import javax.swing.stereotype.Bindable;
 import javax.swing.stereotype.Resource;
 import javax.swing.stereotype.scope.PrototypeScoped;
 import javax.swing.text.JTextComponent;
+import javax.swing.thread.ThreadPool;
 
 import net.vidageek.mirror.dsl.Matcher;
 import net.vidageek.mirror.dsl.Mirror;
@@ -37,7 +41,9 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 @Resource
 @PrototypeScoped
 @Lazy(false)
-public class BindManager implements PropertyChangeListener, DocumentListener, ActionListener, FocusListener, ChangeListener {
+public class BindManager implements PropertyChangeListener, DocumentListener, ActionListener, FocusListener, ChangeListener, MouseListener {
+
+   private ThreadPool                pool               = new ThreadPool(5);
 
    @Inject
    private MirrorPropertyAccessor    acessor;
@@ -55,6 +61,7 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
       addListenerMethods.add("addFocusListener");
       addListenerMethods.add("addPropertyChangeListener");
       addListenerMethods.add("addChangeListener");
+      addListenerMethods.add("addMouseListener");
    }
 
    @Override
@@ -81,7 +88,7 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
          }
       }
       for (Method method : new Mirror().on(this.target.getClass()).reflectAll().methods()) {
-         if (method.isAnnotationPresent(Bindable.class)) {
+         if (method.isAnnotationPresent(Bindable.class) || method.isAnnotationPresent(BindGroup.class)) {
             add(new Binder().target(this.target).method(method).bindables(bindablesOf(method)).context(context).process());
          }
       }
@@ -102,7 +109,13 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
          }
       }
       if (JTextComponent.class.isInstance(component)) {
-         JTextComponent.class.cast(component).getDocument().putProperty("source", component);
+         Object _contador = JTextComponent.class.cast(component).getDocument().getProperty("contador");
+         if (_contador == null) {
+            _contador = 0;
+         }
+         Integer contador = ((Integer) _contador) + 1;
+         JTextComponent.class.cast(component).getDocument().putProperty("contador", contador);
+         JTextComponent.class.cast(component).getDocument().putProperty("source" + contador.intValue(), component);
          JTextComponent.class.cast(component).getDocument().addDocumentListener(this);
       }
    }
@@ -111,7 +124,8 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
       List<Annotation> annotations = new Mirror().on(field).reflectAll().annotationsMatching(new Matcher<Annotation>() {
          @Override
          public boolean accepts(Annotation element) {
-            return element.annotationType().equals(BindGroup.class) || element.annotationType().equals(Bindable.class);
+            return element.annotationType().equals(BindGroup.class)
+                                                                                                            || element.annotationType().equals(Bindable.class);
          }
       });
       List<Bindable> result = new ArrayList<Bindable>(annotations.size());
@@ -129,7 +143,8 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
       List<Annotation> annotations = new Mirror().on(method).reflectAll().annotationsMatching(new Matcher<Annotation>() {
          @Override
          public boolean accepts(Annotation element) {
-            return element.annotationType().equals(BindGroup.class) || element.annotationType().equals(Bindable.class);
+            return element.annotationType().equals(BindGroup.class)
+                                                                                                             || element.annotationType().equals(Bindable.class);
          }
       });
       List<Bindable> result = new ArrayList<Bindable>(annotations.size());
@@ -146,6 +161,13 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
    @Override
    public void changedUpdate(DocumentEvent e) {
       process(e);
+   }
+
+   @Override
+   @PreDestroy
+   protected void finalize() throws Throwable {
+      pool.shutdown();
+      super.finalize();
    }
 
    @Override
@@ -167,17 +189,40 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
       process(e);
    }
 
+   @Override
+   public void mouseClicked(MouseEvent e) {
+      process(e);
+   }
+
+   @Override
+   public void mouseEntered(MouseEvent e) {
+      process(e);
+   }
+
+   @Override
+   public void mouseExited(MouseEvent e) {
+      process(e);
+   }
+
+   @Override
+   public void mousePressed(MouseEvent e) {
+      process(e);
+   }
+
+   @Override
+   public void mouseReleased(MouseEvent e) {
+      process(e);
+   }
+
    public BindManager process(final Object e) {
-      new Thread(new Runnable() {
+      pool.execute(new Runnable() {
          @Override
          public void run() {
-            synchronized (lock) {
-               for (Binder binder : getBinders()) {
-                  binder.apply(root, e);
-               }
+            for (Binder binder : getBinders()) {
+               binder.apply(root, e);
             }
          }
-      }).start();
+      });
       return this;
    }
 
@@ -195,5 +240,4 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
    public void stateChanged(ChangeEvent e) {
       process(e);
    }
-
 }

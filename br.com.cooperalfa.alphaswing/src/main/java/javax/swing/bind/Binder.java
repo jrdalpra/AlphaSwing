@@ -37,10 +37,13 @@ public class Binder {
          return;
       }
       for (Bindable bindable : expressions.keySet()) {
-         _old = targetExpressions.get(bindable).getValue(this.method == null ? target : _target.method(method).withoutArgs());
-         _new = expressions.get(bindable).getValue(context);
-         if (_new != null && (_old == null || !_old.equals(_new))) {
-            targetExpressions.get(bindable).setValue(this.method == null ? target : _target.method(method).withoutArgs(), _new);
+         try {
+            _old = targetExpressions.get(bindable).getValue(this.method == null ? target : _target.method(method).withoutArgs());
+            _new = expressions.get(bindable).getValue(context);
+            if (_new != null && (_old == null || !_old.equals(_new))) {
+               targetExpressions.get(bindable).setValue(this.method == null ? target : _target.method(method).withoutArgs(), _new);
+            }
+         } catch (Exception e) {
          }
       }
    }
@@ -60,7 +63,12 @@ public class Binder {
          return false;
       }
       if (DocumentEvent.class.isInstance(event)) {
-         return DocumentEvent.class.cast(event).getDocument().getProperty("source") == target;
+         Integer contador = (Integer) DocumentEvent.class.cast(event).getDocument().getProperty("contador");
+         for (int i = 0; i < contador; i++) {
+            if (DocumentEvent.class.cast(event).getDocument().getProperty("source" + (i + 1)) == target) {
+               return true;
+            }
+         }
       }
       return false;
    }

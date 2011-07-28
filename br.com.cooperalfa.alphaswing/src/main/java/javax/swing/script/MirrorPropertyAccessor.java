@@ -40,7 +40,12 @@ public class MirrorPropertyAccessor implements PropertyAccessor {
    public TypedValue read(EvaluationContext context,
                           Object target,
                           String name) throws AccessException {
-      AccessorsController _target = new Mirror().on(target);
+      AccessorsController _target;
+      try {
+         _target = new Mirror().on(target);
+      } catch (Exception e) {
+         return new TypedValue(null);
+      }
       try {
          return new TypedValue(_target.invoke().getterFor(name));
       } catch (MirrorException e1) {

@@ -22,6 +22,7 @@ import javax.swing.register.AnnotationProcessorRegistra;
 import javax.swing.register.ComponentFactoryRegistra;
 import javax.swing.register.PostInstantiatonProcessorRegistra;
 import javax.swing.script.MirrorPropertyAccessor;
+import javax.swing.stereotype.Ignore;
 import javax.swing.stereotype.Resource;
 import javax.swing.util.AnnotationUtils;
 import javax.swing.util.FieldUtils;
@@ -103,7 +104,7 @@ public class DefaultComponentProcessor implements ComponentProcessor {
          for (Field field : fields) {
             for (ComponentFactory factory : factories) {
                if (factory.canProvide(field.getType())) {
-                  if (_get.field(field) == null) {
+                  if (_get.field(field) == null && !isIgnored(field)) {
                      _set.field(field).withValue(factory.provide(field.getType()));
                      for (PostInstantiatorProcessor processor : postInstantiatonProcessors) {
                         if (processor.accepts(_get.field(field))) {
@@ -143,6 +144,10 @@ public class DefaultComponentProcessor implements ComponentProcessor {
       return MirrorPropertyAccessor.class.isInstance(component) || BindManager.class.isInstance(component) || Binder.class.isInstance(component);
    }
 
+   private boolean isIgnored(Field field) {
+      return field.isAnnotationPresent(Ignore.class);
+   }
+
    private <C> boolean isManaged(C component) {
       if (component == null || isFromBindAPI(component)) {
          return false;
@@ -178,7 +183,7 @@ public class DefaultComponentProcessor implements ComponentProcessor {
          }
       }
       bl_Annotations:
-      for (Annotation annotation : definition.getEargerAnnotations()) {
+      for (Annotation annotation : definition.getLazyAnnotations()) {
          for (AnnotationProcessor processor : processors) {
             if (processor.accepts(annotation, definition)) {
                processor.process(annotation, definition);

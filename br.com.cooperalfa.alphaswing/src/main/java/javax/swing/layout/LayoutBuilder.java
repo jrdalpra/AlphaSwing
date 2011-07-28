@@ -6,6 +6,8 @@ import java.awt.LayoutManager;
 
 public interface LayoutBuilder<L extends LayoutManager, T extends LayoutBuilder<L, T>> {
 
+   T build();
+
    L getLayout();
 
    Container getTarget();

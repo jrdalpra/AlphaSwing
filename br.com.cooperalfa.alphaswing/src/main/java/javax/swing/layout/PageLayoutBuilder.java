@@ -21,6 +21,12 @@ public class PageLayoutBuilder implements LayoutBuilder<PageLayout, PageLayoutBu
       this.children = new ArrayList<Component>();
    }
 
+   @Override
+   public PageLayoutBuilder build() {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
    private void checkTarget() {
       if (!hasTarget()) {
          throw new UnsupportedOperationException("There's no target on this builder!");

@@ -17,7 +17,7 @@
 	default-autowire="no">
 
 	<context:annotation-config />
-	<context:component-scan base-package="javax.swing" />
+	<context:component-scan base-package="javax.swing"/>
 
 	<bean id="swingBeanExpressionResolver"
 		class="org.springframework.context.expression.StandardBeanExpressionResolver" />

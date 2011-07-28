@@ -13,6 +13,12 @@ public class FlowLayoutBuilder implements LayoutBuilder<FlowLayout, FlowLayoutBu
       this.layout = new FlowLayout();
    }
 
+   @Override
+   public FlowLayoutBuilder build() {
+      this.target.setLayout(this.layout);
+      return this;
+   }
+
    public FlowLayoutBuilder center() {
       this.layout.setAlignment(FlowLayout.CENTER);
       return this;
@@ -39,6 +45,11 @@ public class FlowLayoutBuilder implements LayoutBuilder<FlowLayout, FlowLayoutBu
       return this.target != null;
    }
 
+   public FlowLayoutBuilder leading() {
+      this.layout.setAlignment(FlowLayout.LEADING);
+      return this;
+   }
+
    public FlowLayoutBuilder left() {
       this.layout.setAlignment(FlowLayout.LEFT);
       return this;
@@ -48,6 +59,16 @@ public class FlowLayoutBuilder implements LayoutBuilder<FlowLayout, FlowLayoutBu
    public FlowLayoutBuilder on(Container target) {
       this.target = target;
       this.target.setLayout(this.layout);
+      return this;
+   }
+
+   public FlowLayoutBuilder right() {
+      this.layout.setAlignment(FlowLayout.RIGHT);
+      return this;
+   }
+
+   public FlowLayoutBuilder trailing() {
+      this.layout.setAlignment(FlowLayout.TRAILING);
       return this;
    }
 

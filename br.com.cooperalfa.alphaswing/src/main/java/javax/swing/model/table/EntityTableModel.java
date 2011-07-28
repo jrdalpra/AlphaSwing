@@ -1,6 +1,8 @@
 package javax.swing.model.table;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.event.TableModelListener;
@@ -15,6 +17,18 @@ public class EntityTableModel implements TableModel {
 
    @Override
    public void addTableModelListener(TableModelListener l) {
+   }
+
+   public EntityTableModel except(String... except) {
+      ArrayList<Field> toRemove = new ArrayList<Field>();
+      List<String> exceptList = Arrays.asList(except);
+      for (Field field : fields) {
+         if (exceptList.contains(field.getName())) {
+            toRemove.add(field);
+         }
+      }
+      fields.removeAll(toRemove);
+      return this;
    }
 
    public <E> EntityTableModel forEntity(Class<E> clazz) {

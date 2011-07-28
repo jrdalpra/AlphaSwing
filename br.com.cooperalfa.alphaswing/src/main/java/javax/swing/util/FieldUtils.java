@@ -1,6 +1,8 @@
 package javax.swing.util;
 
+import java.awt.Component;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -20,7 +22,16 @@ public class FieldUtils {
 
       @Override
       public boolean accepts(Field field) {
-         return accepts(field.getType());
+         return !Modifier.isStatic(field.getModifiers()) && accepts(field.getType()) && !isDefinedOnSwingAPI(field);
+      }
+
+      private boolean isDefinedOnSwingAPI(Field field) {
+         return Component.class.isAssignableFrom(field.getType()) && isOnAPIPackage(field);
+      }
+
+      private boolean isOnAPIPackage(Field field) {
+         String pkg = field.getDeclaringClass().getPackage().getName();
+         return pkg.contains("swing") || pkg.contains("awt");
       }
    }
 

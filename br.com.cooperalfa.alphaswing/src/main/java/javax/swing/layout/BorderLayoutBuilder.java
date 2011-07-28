@@ -14,6 +14,12 @@ public class BorderLayoutBuilder implements LayoutBuilder<BorderLayout, BorderLa
    }
 
    @Override
+   public BorderLayoutBuilder build() {
+      this.target.setLayout(this.layout);
+      return this;
+   }
+
+   @Override
    public BorderLayout getLayout() {
       return layout;
    }
