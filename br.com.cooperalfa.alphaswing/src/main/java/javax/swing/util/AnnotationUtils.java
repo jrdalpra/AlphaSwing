@@ -9,11 +9,18 @@ import javax.swing.stereotype.BindGroup;
 import javax.swing.stereotype.Bindable;
 import javax.swing.stereotype.IsLazy;
 import javax.swing.stereotype.IsManaged;
+import javax.swing.stereotype.Property;
 
 import net.vidageek.mirror.dsl.Matcher;
 import net.vidageek.mirror.dsl.Mirror;
 
 public class AnnotationUtils {
+
+   public static final List<String> lazyProperties = new ArrayList<String>();
+
+   static {
+      lazyProperties.add("visible");
+   }
 
    private static class ManagedAnnotationMatcher implements Matcher<Annotation> {
       @Override
@@ -51,7 +58,15 @@ public class AnnotationUtils {
    }
 
    public static boolean isLazy(Annotation annotation) {
-      return isLazy(annotation.annotationType());
+      return isLazy(annotation.annotationType()) || isLazyPropertyAnnotation(annotation);
+   }
+
+   private static boolean isLazyPropertyAnnotation(Annotation annotation) {
+      if (!Property.class.isAssignableFrom(annotation.annotationType())) {
+         return false;
+      }
+      Property property = Property.class.cast(annotation);
+      return property.lazy() || lazyProperties.contains(property.name());
    }
 
    public static boolean isLazy(Class<?> type) {

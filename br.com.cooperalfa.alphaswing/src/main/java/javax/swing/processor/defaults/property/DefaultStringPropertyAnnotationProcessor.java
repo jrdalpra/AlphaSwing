@@ -1,6 +1,7 @@
 package javax.swing.processor.defaults.property;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 import javax.swing.api.ComponentDefinition;
 import javax.swing.stereotype.Property;
@@ -15,12 +16,21 @@ public class DefaultStringPropertyAnnotationProcessor extends AbstractPropertyAn
    @Override
    public <A extends Annotation> boolean accepts(A annotation,
                                                  ComponentDefinition component) {
-      return super.accepts(annotation, component) && (isText(annotation) || isString(annotation, component.getTarget()));
+      return super.accepts(annotation, component) && (isString(annotation, component.getTarget()) || isText(annotation));
    }
 
    private <A extends Annotation, T> boolean isString(A annotation,
                                                       T target) {
       try {
+         for (Method method : new Mirror().on(target.getClass()).reflectAll().methods()) {
+            if (method.getName().equalsIgnoreCase("set" + cast(annotation).name())) {
+               for (Class<?> parameter : method.getParameterTypes()) {
+                  if (String.class.isAssignableFrom(parameter)) {
+                     return true;
+                  }
+               }
+            }
+         }
          return new Mirror().on(target.getClass()).reflect().field(cast(annotation).name()).getType().equals(String.class);
       } catch (NullPointerException npe) {
       }

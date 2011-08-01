@@ -32,10 +32,12 @@ public class DefaultPropertiesAnnotationProcessor implements AnnotationProcessor
    @Override
    public <A extends Annotation> void process(A annotation,
                                               ComponentDefinition component) {
+      // TODO AnnotationMetadata ao invés de Annotation
       for (Property property : asList(Properties.class.cast(annotation).value())) {
          for (AnnotationProcessor processor : registra) {
             if (processor.accepts(property, component)) {
                processor.process(property, component);
+               break;
             }
          }
       }

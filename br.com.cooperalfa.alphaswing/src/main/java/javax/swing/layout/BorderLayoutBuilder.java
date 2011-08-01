@@ -47,8 +47,10 @@ public class BorderLayoutBuilder implements LayoutBuilder<BorderLayout, BorderLa
 
    @Override
    public BorderLayoutBuilder with(Component... children) {
-      // TODO Auto-generated method stub
-      return null;
+      for (Component component : children) {
+         target.add(component);
+      }
+      return this;
    }
 
 }

@@ -29,7 +29,7 @@ public class DefaultExternalPropertyProcessor extends AbstractPropertyAnnotation
    @Override
    public <A extends Annotation> boolean accepts(A annotation,
                                                  ComponentDefinition definiton) {
-      return super.isProperty(annotation) && ((cast(annotation).value().startsWith("${") || cast(annotation).value().startsWith("#{")) && cast(annotation).value().endsWith("}"));
+      return super.isProperty(annotation) && (cast(annotation).value().startsWith("#{") && cast(annotation).value().endsWith("}"));
    }
 
    @PostConstruct
