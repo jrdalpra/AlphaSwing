@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.event.DocumentEvent;
-import javax.swing.stereotype.Bindable;
+import javax.swing.stereotype.Bind;
 
 import net.vidageek.mirror.dsl.Mirror;
 import net.vidageek.mirror.invoke.dsl.InvocationHandler;
@@ -17,11 +17,11 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 public class Binder {
 
-   private List<Bindable>              bindables;
+   private List<Bind>              bindables;
    private static SpelExpressionParser parser            = new SpelExpressionParser();
 
-   private Map<Bindable, Expression>   expressions       = new HashMap<Bindable, Expression>();
-   private Map<Bindable, Expression>   targetExpressions = new HashMap<Bindable, Expression>();
+   private Map<Bind, Expression>   expressions       = new HashMap<Bind, Expression>();
+   private Map<Bind, Expression>   targetExpressions = new HashMap<Bind, Expression>();
    private InvocationHandler<Object>   _target;
    private EvaluationContext           context;
    private Object                      target;
@@ -36,7 +36,7 @@ public class Binder {
       if (isSource(event)) {
          return;
       }
-      for (Bindable bindable : expressions.keySet()) {
+      for (Bind bindable : expressions.keySet()) {
          try {
             _old = targetExpressions.get(bindable).getValue(this.method == null ? target : _target.method(method).withoutArgs());
             _new = expressions.get(bindable).getValue(context);
@@ -48,7 +48,7 @@ public class Binder {
       }
    }
 
-   public Binder bindables(List<Bindable> bindables) {
+   public Binder bindables(List<Bind> bindables) {
       this.bindables = bindables;
       return this;
    }
@@ -79,8 +79,8 @@ public class Binder {
    }
 
    public Binder process() {
-      for (Bindable bindable : bindables) {
-         expressions.put(bindable, parser.parseExpression(bindable.source()));
+      for (Bind bindable : bindables) {
+         expressions.put(bindable, parser.parseExpression(bindable.value()));
          targetExpressions.put(bindable, parser.parseExpression(bindable.property()));
       }
       return this;

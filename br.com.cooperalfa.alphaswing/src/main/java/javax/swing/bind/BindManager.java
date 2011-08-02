@@ -24,7 +24,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.script.MirrorPropertyAccessor;
 import javax.swing.stereotype.BindGroup;
-import javax.swing.stereotype.Bindable;
+import javax.swing.stereotype.Bind;
 import javax.swing.stereotype.Resource;
 import javax.swing.stereotype.scope.PrototypeScoped;
 import javax.swing.text.JTextComponent;
@@ -88,7 +88,7 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
          }
       }
       for (Method method : new Mirror().on(this.target.getClass()).reflectAll().methods()) {
-         if (method.isAnnotationPresent(Bindable.class) || method.isAnnotationPresent(BindGroup.class)) {
+         if (method.isAnnotationPresent(Bind.class) || method.isAnnotationPresent(BindGroup.class)) {
             add(new Binder().target(this.target).method(method).bindables(bindablesOf(method)).context(context).process());
          }
       }
@@ -120,18 +120,18 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
       }
    }
 
-   private List<Bindable> bindablesOf(Field field) {
+   private List<Bind> bindablesOf(Field field) {
       List<Annotation> annotations = new Mirror().on(field).reflectAll().annotationsMatching(new Matcher<Annotation>() {
          @Override
          public boolean accepts(Annotation element) {
             return element.annotationType().equals(BindGroup.class)
-                                                                                                            || element.annotationType().equals(Bindable.class);
+                                                                                                            || element.annotationType().equals(Bind.class);
          }
       });
-      List<Bindable> result = new ArrayList<Bindable>(annotations.size());
+      List<Bind> result = new ArrayList<Bind>(annotations.size());
       for (Annotation annotation : annotations) {
-         if (annotation.annotationType().equals(Bindable.class)) {
-            result.add(Bindable.class.cast(annotation));
+         if (annotation.annotationType().equals(Bind.class)) {
+            result.add(Bind.class.cast(annotation));
          } else {
             result.addAll(Arrays.asList(BindGroup.class.cast(annotation).value()));
          }
@@ -139,18 +139,18 @@ public class BindManager implements PropertyChangeListener, DocumentListener, Ac
       return result;
    }
 
-   private List<Bindable> bindablesOf(Method method) {
+   private List<Bind> bindablesOf(Method method) {
       List<Annotation> annotations = new Mirror().on(method).reflectAll().annotationsMatching(new Matcher<Annotation>() {
          @Override
          public boolean accepts(Annotation element) {
             return element.annotationType().equals(BindGroup.class)
-                                                                                                             || element.annotationType().equals(Bindable.class);
+                                                                                                             || element.annotationType().equals(Bind.class);
          }
       });
-      List<Bindable> result = new ArrayList<Bindable>(annotations.size());
+      List<Bind> result = new ArrayList<Bind>(annotations.size());
       for (Annotation annotation : annotations) {
-         if (annotation.annotationType().equals(Bindable.class)) {
-            result.add(Bindable.class.cast(annotation));
+         if (annotation.annotationType().equals(Bind.class)) {
+            result.add(Bind.class.cast(annotation));
          } else {
             result.addAll(Arrays.asList(BindGroup.class.cast(annotation).value()));
          }

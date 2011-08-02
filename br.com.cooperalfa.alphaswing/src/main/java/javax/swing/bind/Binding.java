@@ -12,15 +12,15 @@ import net.vidageek.mirror.dsl.Mirror;
 
 import org.springframework.util.StringUtils;
 
-public class BindingProxy implements MethodInterceptor, HasBindableSupport {
+public class Binding implements MethodInterceptor, HasBindableSupport {
 
    @SuppressWarnings("unchecked")
    public static <T> T bindable(Class<T> clazz) {
-      BindingProxy interceptor = new BindingProxy();
+      Binding interceptor = new Binding();
       Enhancer enhancer = new Enhancer();
       enhancer.setSuperclass(clazz);
       enhancer.setInterfaces(new Class[] {
-         HasBindableSupport.class
+              HasBindableSupport.class
       });
       enhancer.setCallback(interceptor);
       T proxy = (T) enhancer.create();

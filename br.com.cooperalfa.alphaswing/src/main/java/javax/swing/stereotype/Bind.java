@@ -17,5 +17,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Documented
 @IsManaged
 @Qualifier
-public @interface Bindable {
+public @interface Bind {
+   String property() default "?";
+
+   String value();
+
 }

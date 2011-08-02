@@ -18,5 +18,5 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @IsManaged
 @Qualifier
 public @interface BindGroup {
-   Bindable[] value();
+   Bind[] value();
 }

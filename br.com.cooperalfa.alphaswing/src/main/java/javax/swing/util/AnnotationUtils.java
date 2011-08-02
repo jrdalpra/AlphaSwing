@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.stereotype.BindGroup;
-import javax.swing.stereotype.Bindable;
+import javax.swing.stereotype.Bind;
 import javax.swing.stereotype.IsLazy;
 import javax.swing.stereotype.IsManaged;
 import javax.swing.stereotype.Property;
@@ -54,7 +54,7 @@ public class AnnotationUtils {
    }
 
    public static Boolean isBindable(Annotation annotation) {
-      return Bindable.class.isAssignableFrom(annotation.annotationType()) || BindGroup.class.isAssignableFrom(annotation.annotationType());
+      return Bind.class.isAssignableFrom(annotation.annotationType()) || BindGroup.class.isAssignableFrom(annotation.annotationType());
    }
 
    public static boolean isLazy(Annotation annotation) {
