@@ -12,14 +12,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
          ElementType.TYPE,
-         ElementType.FIELD
+         ElementType.FIELD,
+         ElementType.METHOD
 })
 @IsManaged
 @Qualifier
 public @interface Action {
    Class<? extends EventListener> listener() default ActionListener.class;
 
-   String method();
+   String method() default "?";
 
    String qualifier() default "actionPerformed";
 }

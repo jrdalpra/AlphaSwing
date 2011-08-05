@@ -3,6 +3,7 @@ package javax.swing.processor.defaults;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +130,9 @@ public class DefaultComponentProcessor implements ComponentProcessor {
             methods = child.getInitMethods();
             invoke = new Mirror().on(child.getTarget()).invoke();
             for (Method method : methods) {
-               invoke.method(method).withoutArgs();
+               if (!hasParameterOn(method)) {
+                  invoke.method(method).withoutArgs();
+               }
             }
          }
       }
@@ -138,6 +141,10 @@ public class DefaultComponentProcessor implements ComponentProcessor {
       for (Method method : methods) {
          invoke.method(method).withoutArgs();
       }
+   }
+
+   private boolean hasParameterOn(Method method) {
+      return Arrays.asList(method.getTypeParameters()).isEmpty();
    }
 
    private <C> boolean isFromBindAPI(C component) {
