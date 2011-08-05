@@ -47,4 +47,8 @@ public class FieldUtils {
       return new Mirror().on(type).reflectAll().fieldsMatching(matcher());
    }
 
+   public static List<Field> reflectAllFields(Class<?> type) {
+      return new Mirror().on(type).reflectAll().fields();
+   }
+
 }
