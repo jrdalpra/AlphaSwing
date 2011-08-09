@@ -131,8 +131,13 @@ public class RelativeLayout implements LayoutManager2 {
          switch (this) {
             case FILL: {
                switch (constraint.x) {
+                  case SAME:
                   case LEFT: {
                      constraint.size.width = (int) (parent.getSize().width - constraint.gapX + constraint.plusWidth);
+                     break;
+                  }
+                  case AFTER: {
+                     constraint.size.width = (int) (parent.getSize().width - constraint.relative.getSize().getWidth() - constraint.gapX + constraint.plusWidth);
                      break;
                   }
                   case CENTER: {
@@ -144,6 +149,12 @@ public class RelativeLayout implements LayoutManager2 {
                      break;
                   }
                }
+               break;
+            }
+            case FIT: {
+               double width = constraint.last.getLocation().getX() - constraint.last.getSize().getWidth();
+               width -= (constraint.relative.getSize().getWidth() * 0.68) - constraint.gapX + constraint.plusWidth;
+               constraint.size.setSize(width, constraint.size.getHeight());
                break;
             }
             case SAME: {
@@ -181,7 +192,7 @@ public class RelativeLayout implements LayoutManager2 {
                break;
             }
             case FIT: {
-               double height = constraint.last.getY() - target.getY() - constraint.last.getHeight() - constraint.gapY + constraint.plusHeight;
+               double height = constraint.last.getY() - (target.getY() / 2) - constraint.last.getHeight() - constraint.gapY + constraint.plusHeight;
                constraint.size.setSize(constraint.size.getWidth(), height);
                break;
             }
@@ -250,7 +261,11 @@ public class RelativeLayout implements LayoutManager2 {
       }
 
       public Constraint width(Width width) {
-         return size(width, Height.PREFFERED);
+         return size(width, this.height);
+      }
+
+      public Constraint height(Height height) {
+         return size(this.width, height);
       }
 
       public Constraint align(X x, Y y) {
@@ -342,9 +357,8 @@ public class RelativeLayout implements LayoutManager2 {
                }
 
             }
-            return this;
          }
-         return null;
+         return this;
       }
 
       private void process(Component parent, Component target) {
@@ -450,7 +464,6 @@ public class RelativeLayout implements LayoutManager2 {
          }
          last = pair.component;
       }
-
    }
 
    @Override
