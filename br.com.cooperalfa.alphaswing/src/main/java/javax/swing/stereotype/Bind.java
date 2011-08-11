@@ -15,8 +15,18 @@ import java.lang.annotation.Target;
 @Documented
 @IsManaged
 public @interface Bind {
-   String property() default "?";
+   /**
+    * Target property of databinding
+    * 
+    * @return
+    */
+   String property();
 
+   /**
+    * The source of the value. You can use a ${expression}.
+    * 
+    * @return
+    */
    String value();
 
    /**
