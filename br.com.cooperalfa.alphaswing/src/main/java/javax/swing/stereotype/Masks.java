@@ -6,24 +6,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
 @Target({
          ElementType.TYPE,
-         ElementType.FIELD,
-         ElementType.METHOD
+         ElementType.FIELD
 })
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
 @IsManaged
-public @interface Bind {
-   String property() default "?";
-
-   String value();
-
-   /**
-    * Two-way binding
-    * 
-    * @return
-    */
-   boolean mutual() default false;
-
+public @interface Masks {
+   Mask[] value();
 }
