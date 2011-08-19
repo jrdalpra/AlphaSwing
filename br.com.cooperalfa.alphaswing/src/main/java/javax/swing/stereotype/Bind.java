@@ -23,7 +23,8 @@ public @interface Bind {
    String property();
 
    /**
-    * The source of the value. You can use a ${expression}.
+    * The source of the value. You can use a ${expression}. When you use
+    * ${expression}, {@link Bind#mutual()} will not work.
     * 
     * @return
     */
