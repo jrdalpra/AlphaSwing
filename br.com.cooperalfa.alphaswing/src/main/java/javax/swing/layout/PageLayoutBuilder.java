@@ -37,18 +37,18 @@ public class PageLayoutBuilder implements LayoutBuilder<PageLayout, PageLayoutBu
       if (!hasDone) {
          this.layout = new Column(this.children.toArray(new Component[this.children.size()])).createLayout(target);
       }
-      return layout;
+     return layout;
    }
 
    @Override
-   public PageLayout getLayout() {
+  public PageLayout getLayout() {
       checkTarget();
       return doLayout();
    }
 
    @Override
    public Container getTarget() {
-      checkTarget();
+     checkTarget();
       doLayout();
       return this.target;
    }

@@ -158,3 +158,87 @@ public class PaisForm extends JPanel
 	
 }
 
+//Versão com configuracao
+
+public LoginFrame extends JFrame {
+
+   @Bindable
+   private Usuario usuario;
+
+   @Inject
+   @Bind(property="text", value="usuario.login", mutual=true)
+   @ValidateBasedOn("usuario.login")
+   @MaskBasedOn("usuario.login")
+   private JTextField login
+
+   @Inject
+   @ValidateBasedOn("usuario.senha")
+   @MaskBasedOn("usuario.senha")
+   private JTextField senha;
+
+   @Inject
+   @Style(sclass="okbutton")
+   @Bind(property="enabled","${senha.enabled}")
+   @Action(name="onOk")
+   private JButton ok;
+
+   public void initUI(){
+
+      //BindingUtils.bind(login,"text",usuario,"login",true); // mesmo que @Bind
+      //BindingUtils.bind(senha,"enabled","${login.text.length > 0}");  
+      //BindingUtils.bind(ok,"enabled","${senha.enabled}");
+
+      new FormLayout(2,3).labelsOn(LEFT)
+                     .with(new FormItem("Login",login).widget(FILL))
+                     .with(new FormItem("Senah",senha))
+                     .on(this);  
+   }
+
+   @Action(label="${tradutor.traduz('Entrar')}",key=Key.Enter,ctrl=true)
+   public void onOk(Action event){
+   }
+
+   public void setUsuario(Usuario novo){
+      this.usuario = BindableObject.bind(novo);
+   }
+
+   public Usuario getUsuario(){
+      return ((BindableObject)usuario).getTarget();
+   }
+}
+
+
+// Versaon com convensões
+
+@Component
+@MenuItem
+public LoginFrame extends JFrame{
+   
+   @Getter // lombok
+   @Setter // lombok
+   @Bindable
+   private Usuario usuario;
+   
+   @Inject
+   private JTextField usuario_login;
+   
+   @Inject
+   private JTextField usuario_senha;
+   
+   private JButton ok;
+   
+   public void initUI(){      
+      new Form().with(new FormItem("Login",usuario_login).widgethWidth(FILL))
+              .with(new FormItem("Senha",usuario_senha))
+              .with(new FormItem(null,ok).columnSpan(2))
+              .labelsOnX(LEFT)
+              .on(this);   
+   }
+
+   public void onOk(ActionEvent event){
+   }
+   
+}
+
+
+
